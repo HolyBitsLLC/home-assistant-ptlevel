@@ -1,0 +1,11 @@
+{
+  "domain": "ptlevel",
+  "name": "PTLevel",
+  "codeowners": ["@your-github-username"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/your-org/home-assistant-ptlevel",
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "version": "0.1.0"
+}
