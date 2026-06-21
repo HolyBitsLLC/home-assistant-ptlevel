@@ -1,0 +1,22 @@
+{
+  "title": "PTLevel",
+  "config": {
+    "step": {
+      "user": {
+        "title": "PTLevel Setup",
+        "description": "Enter your PTDevices account credentials.",
+        "data": {
+          "username": "Email / Username",
+          "password": "Password",
+          "api_base": "API Base URL",
+          "update_interval": "Update Interval (seconds)"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid credentials. Please check your username and password.",
+      "cannot_connect": "Cannot connect to PTDevices. Check your API URL and internet connection.",
+      "unknown": "An unexpected error occurred."
+    }
+  }
+}
