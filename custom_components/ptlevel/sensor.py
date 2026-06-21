@@ -6,7 +6,19 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, SENSOR_TYPES, SENSOR_BATTERY, SENSOR_LAST_UPDATE, SENSOR_SIGNAL, SENSOR_TANK_LEVEL, SENSOR_TANK_VOLUME
+from .const import (
+    DOMAIN,
+    SENSOR_TYPES,
+    SENSOR_BATTERY_STATUS,
+    SENSOR_BATTERY_VOLTAGE,
+    SENSOR_FIRMWARE,
+    SENSOR_LAST_UPDATE,
+    SENSOR_ONLINE,
+    SENSOR_TANK_LEVEL,
+    SENSOR_TANK_LEVEL_IN,
+    SENSOR_TANK_VOLUME,
+    SENSOR_TEMPERATURE,
+)
 from .coordinator import PTLevelCoordinator
 
 
@@ -64,12 +76,20 @@ class PTLevelSensor(CoordinatorEntity, SensorEntity):
             if device["id"] == self._device_id:
                 if self._sensor_key == SENSOR_TANK_LEVEL:
                     return device.get("level_percent")
+                elif self._sensor_key == SENSOR_TANK_LEVEL_IN:
+                    return device.get("level_inches")
                 elif self._sensor_key == SENSOR_TANK_VOLUME:
-                    return device.get("volume_liters")
-                elif self._sensor_key == SENSOR_BATTERY:
-                    return device.get("battery_percent")
-                elif self._sensor_key == SENSOR_SIGNAL:
-                    return device.get("signal_dbm")
+                    return device.get("volume")
+                elif self._sensor_key == SENSOR_BATTERY_VOLTAGE:
+                    return device.get("battery_voltage")
+                elif self._sensor_key == SENSOR_TEMPERATURE:
+                    return device.get("temperature")
+                elif self._sensor_key == SENSOR_BATTERY_STATUS:
+                    return "Good" if device.get("battery_ok") else "Low"
+                elif self._sensor_key == SENSOR_ONLINE:
+                    return "Online" if device.get("online") else "Offline"
+                elif self._sensor_key == SENSOR_FIRMWARE:
+                    return device.get("firmware_version")
                 elif self._sensor_key == SENSOR_LAST_UPDATE:
                     return device.get("last_updated")
         return None
