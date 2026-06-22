@@ -1,8 +1,9 @@
 """Sensor platform for PTLevel integration."""
 
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -36,8 +37,7 @@ async def async_setup_entry(
             entities.append(
                 PTLevelSensor(
                     coordinator=coordinator,
-                    device_id=device["id"],
-                    device_name=device["name"],
+                    device=dict(device),
                     sensor_key=sensor_key,
                     sensor_info=sensor_info,
                 )
@@ -52,22 +52,31 @@ class PTLevelSensor(CoordinatorEntity, SensorEntity):
     def __init__(
         self,
         coordinator: PTLevelCoordinator,
-        device_id: str,
-        device_name: str,
+        device: dict,
         sensor_key: str,
         sensor_info: dict,
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator)
-        self._device_id = device_id
+        self._device_id = device["id"]
         self._sensor_key = sensor_key
-        self._attr_name = f"{device_name} {sensor_info['name']}"
-        self._attr_unique_id = f"{device_id}_{sensor_key}"
+        self._attr_name = f"{device['name']} {sensor_info['name']}"
+        self._attr_unique_id = f"{device['id']}_{sensor_key}"
         self._attr_native_unit_of_measurement = sensor_info.get("unit")
         self._attr_device_class = sensor_info.get("device_class")
         self._attr_icon = sensor_info.get("icon")
         if sensor_info.get("state_class"):
             self._attr_state_class = sensor_info["state_class"]
+
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, device["id"])},
+            name=device["name"],
+            manufacturer="ParemTech",
+            model="PTLevel Wireless Tank Monitor",
+            sw_version=device.get("firmware_version"),
+            hw_version=f"TX v{device.get('tx_version', '')}" if device.get("tx_version") else None,
+            configuration_url="https://ptdevices.com",
+        )
 
     @property
     def native_value(self):
@@ -93,14 +102,3 @@ class PTLevelSensor(CoordinatorEntity, SensorEntity):
                 elif self._sensor_key == SENSOR_LAST_UPDATE:
                     return device.get("last_updated")
         return None
-
-    @property
-    def extra_state_attributes(self):
-        """Return extra attributes."""
-        for device in self.coordinator.data.get("devices", []):
-            if device["id"] == self._device_id:
-                return {
-                    "device_id": device["id"],
-                    "device_name": device["name"],
-                }
-        return {}
